@@ -56,38 +56,29 @@ TEST_F(equal_test, ProjectionTest)
 
 TEST_F(equal_test, EmptyRangeN)
 {
-    EXPECT_TRUE(alg::equal_n(std::begin(v1), 0, std::begin(v2), 0));
-
-    EXPECT_FALSE(alg::equal_n(std::begin(v1), std::size(v1), std::begin(v2), 0));
-    EXPECT_FALSE(alg::equal_n(std::begin(v1), 0, std::begin(v2), std::size(v2)));
+    EXPECT_TRUE(alg::equal_n(std::begin(v1), std::begin(v2), 0));
 }
 
 TEST_F(equal_test, BasicTestN)
 {
-    EXPECT_TRUE(alg::equal_n(std::begin(v1), std::size(v1) - 1, std::begin(v2), std::size(v2) - 1));
-    EXPECT_TRUE(alg::equal_n(std::begin(v1), std::size(v1) - 1, std::begin(v2), std::size(v2) - 1, pred));
+    EXPECT_TRUE(alg::equal_n(std::begin(v1), std::begin(v2), std::size(v2) - 1));
+    EXPECT_TRUE(alg::equal_n(std::begin(v1), std::begin(v2), std::size(v2) - 1, pred));
 
-    EXPECT_FALSE(alg::equal_n(std::begin(v1), std::size(v1), std::begin(v2), std::size(v2)));
-    EXPECT_TRUE(alg::equal_n(std::begin(v1), std::size(v1), std::begin(v2), std::size(v2), pred));
-
-    EXPECT_FALSE(alg::equal_n(std::begin(v1), std::size(v1) - 1, std::begin(v2), std::size(v2)));
-    EXPECT_FALSE(alg::equal_n(std::begin(v1), std::size(v1), std::begin(v2), std::size(v2) - 1));
+    EXPECT_FALSE(alg::equal_n(std::begin(v1), std::begin(v2), std::size(v2)));
+    EXPECT_TRUE(alg::equal_n(std::begin(v1), std::begin(v2), std::size(v2), pred));
 }
 
 TEST_F(equal_test, RangeTestN)
 {
-    EXPECT_TRUE(alg::equal_n(v1, 4, v2, 4));
-    EXPECT_TRUE(alg::equal_n(v1, 4, v2, 4, pred));
+    EXPECT_TRUE(alg::equal_n(v1, v2, 4));
+    EXPECT_TRUE(alg::equal_n(v1, v2, 4, pred));
 
-    EXPECT_FALSE(alg::equal_n(v1, std::size(v1), v2, std::size(v2)));
-    EXPECT_TRUE(alg::equal_n(v1, std::size(v1), v2, std::size(v2), pred));
-
-    EXPECT_FALSE(alg::equal_n(v1, 4, v2, std::size(v2)));
-    EXPECT_FALSE(alg::equal_n(v1, std::size(v1), v2, 4, pred));
+    EXPECT_FALSE(alg::equal_n(v1, v2, std::size(v2)));
+    EXPECT_TRUE(alg::equal_n(v1, v2, std::size(v2), pred));
 }
 
 TEST_F(equal_test, ProjectionTestN)
 {
-    EXPECT_FALSE(alg::equal_n(v1, 5, v2, 5, {}, p1, p2));
-    EXPECT_TRUE(alg::equal_n(v1, 5, v2, 5, pred, p1, p2));
+    EXPECT_FALSE(alg::equal_n(v1, v2, 5, {}, p1, p2));
+    EXPECT_TRUE(alg::equal_n(v1, v2, 5, pred, p1, p2));
 }

@@ -26,7 +26,7 @@ namespace alg
 	std::indirectly_unary_invocable<std::projected<std::ranges::iterator_t<Range>, Proj>> UnaryOp>
     auto for_each(Range&& range, UnaryOp f, Proj p = {}) -> void
     {
-	for_each(std::ranges::begin(range), std::ranges::end(range), std::move(f), std::move(p));
+	for_each(std::begin(range), std::end(range), std::move(f), std::move(p));
     }
 
 
@@ -46,7 +46,7 @@ namespace alg
 	std::indirectly_unary_invocable<std::projected<std::ranges::iterator_t<Range>, Proj>> UnaryOp>
     auto for_each_n(Range&& range, size_t size, UnaryOp f, Proj p = {}) -> void
     {
-	for_each_n(std::ranges::begin(range), size, std::move(f), std::move(p));
+	for_each_n(std::begin(range), size, std::move(f), std::move(p));
     }
 
     //******************* count ***********************
@@ -75,7 +75,7 @@ namespace alg
 	const T*>
     [[nodiscard]] constexpr auto count(Range&& range, const T& value, Proj p = {})
     {
-	return count(std::ranges::begin(range), std::ranges::end(range), std::move(value), std::move(p));
+	return count(std::begin(range), std::end(range), std::move(value), std::move(p));
     }
 
     //****************** count_n **********************
@@ -103,7 +103,7 @@ namespace alg
 	const T*>
     [[nodiscard]] constexpr auto count_n(Range&& range, size_t size, const T& value, Proj p = {}) 
     {
-	return count_n(std::ranges::begin(range), size, std::move(value), std::move(p));
+	return count_n(std::begin(range), size, std::move(value), std::move(p));
     }
 
 
@@ -127,7 +127,7 @@ namespace alg
 	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
     [[nodiscard]] constexpr auto count_if(Range&& range, Pred f, Proj p = {})
     {
-	return count_if(std::ranges::begin(range), std::ranges::end(range), std::move(f), std::move(p));
+	return count_if(std::begin(range), std::end(range), std::move(f), std::move(p));
     }
 
     
@@ -150,7 +150,7 @@ namespace alg
 	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
     [[nodiscard]] constexpr auto count_if_n(Range&& range, size_t size, Pred f, Proj p = {})
     {
-	return count_if_n(std::ranges::begin(range), size, std::move(f), std::move(p));
+	return count_if_n(std::begin(range), size, std::move(f), std::move(p));
     }
 
     //****************** mismatch *********************
@@ -183,8 +183,8 @@ namespace alg
 		std::ranges::borrowed_iterator_t<Range1>,
 		std::ranges::borrowed_iterator_t<Range2>>
     {
-	return mismatch(std::ranges::begin(range1), std::ranges::end(range1),
-		std::ranges::begin(range2), std::ranges::end(range2),
+	return mismatch(std::begin(range1), std::end(range1),
+		std::begin(range2), std::end(range2),
 		std::move(p), std::move(proj1), std::move(proj2));
     }
 
@@ -218,7 +218,7 @@ namespace alg
 		std::ranges::borrowed_iterator_t<Range1>,
 		std::ranges::borrowed_iterator_t<Range2>>
     {
-	return mismatch_n(std::ranges::begin(range1), std::ranges::begin(range2), size,
+	return mismatch_n(std::begin(range1), std::begin(range2), size,
 		std::move(p), std::move(proj1), std::move(proj2));
     }
 
@@ -251,7 +251,7 @@ namespace alg
     [[nodiscard]] constexpr auto find(Range&& range, const T& value, Proj p = {})
 	-> std::ranges::borrowed_iterator_t<Range>
     {
-	return find(std::ranges::begin(range), std::ranges::end(range),
+	return find(std::begin(range), std::end(range),
 		value, std::move(p));
     }
 
@@ -283,7 +283,7 @@ namespace alg
     [[nodiscard]] constexpr auto find_n(Range&& range, size_t size, const T& value, Proj p = {})
 	-> std::ranges::borrowed_iterator_t<Range>
     {
-	return find_n(std::ranges::begin(range), size, value, std::move(p));
+	return find_n(std::begin(range), size, value, std::move(p));
     }
 
 
@@ -307,7 +307,7 @@ namespace alg
     [[nodiscard]] constexpr auto find_if(Range&& range, Pred f, Proj p = {})
 	-> std::ranges::borrowed_iterator_t<Range>
     {
-	return find_if(std::ranges::begin(range), std::ranges::end(range),
+	return find_if(std::begin(range), std::end(range),
 		std::move(f), std::move(p));
     }
 
@@ -331,7 +331,7 @@ namespace alg
     [[nodiscard]] constexpr auto find_if_n(Range&& range, size_t size, Pred f, Proj p = {})
 	-> std::ranges::borrowed_iterator_t<Range>
     {
-	return find_if_n(std::ranges::begin(range), size, std::move(f), std::move(p));
+	return find_if_n(std::begin(range), size, std::move(f), std::move(p));
     }
 
 
@@ -355,7 +355,7 @@ namespace alg
     [[nodiscard]] constexpr auto find_if_not(Range&& range, Pred f, Proj p = {})
 	-> std::ranges::borrowed_iterator_t<Range>
     {
-	return find_if_not(std::ranges::begin(range), std::ranges::end(range),
+	return find_if_not(std::begin(range), std::end(range),
 		std::move(f), std::move(p));
     }
 
@@ -379,7 +379,7 @@ namespace alg
     [[nodiscard]] constexpr auto find_if_not_n(Range&& range, size_t size, Pred f, Proj p = {})
 	-> std::ranges::borrowed_iterator_t<Range>
     {
-	return find_if_not_n(std::ranges::begin(range), size, std::move(f), std::move(p));
+	return find_if_not_n(std::begin(range), size, std::move(f), std::move(p));
     }
 
 
@@ -399,7 +399,7 @@ namespace alg
 	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
     [[nodiscard]] constexpr auto all_of(Range&& range, Pred f, Proj p = {}) -> bool
     {
-	return all_of(std::ranges::begin(range), std::ranges::end(range),
+	return all_of(std::begin(range), std::end(range),
 		std::move(f), std::move(p));
     }
 
@@ -419,7 +419,7 @@ namespace alg
 	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
     [[nodiscard]] constexpr auto all_of_n(Range&& range, size_t size, Pred f, Proj p = {}) -> bool
     {
-	return all_of_n(std::ranges::begin(range), size, std::move(f), std::move(p));
+	return all_of_n(std::begin(range), size, std::move(f), std::move(p));
     }
 
 
@@ -439,7 +439,7 @@ namespace alg
 	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
     [[nodiscard]] constexpr auto any_of(Range&& range, Pred f, Proj p = {}) -> bool
     {
-	return any_of(std::ranges::begin(range), std::ranges::end(range),
+	return any_of(std::begin(range), std::end(range),
 		std::move(f), std::move(p));
     }
 
@@ -459,7 +459,7 @@ namespace alg
 	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
     [[nodiscard]] constexpr auto any_of_n(Range&& range, size_t size, Pred f, Proj p = {}) -> bool
     {
-	return any_of_n(std::ranges::begin(range), size, std::move(f), std::move(p));
+	return any_of_n(std::begin(range), size, std::move(f), std::move(p));
     }
 
 
@@ -479,7 +479,7 @@ namespace alg
 	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
     [[nodiscard]] constexpr auto none_of(Range&& range, Pred f, Proj p = {}) -> bool
     {
-	return none_of(std::ranges::begin(range), std::ranges::end(range),
+	return none_of(std::begin(range), std::end(range),
 		std::move(f), std::move(p));
     }
 
@@ -499,7 +499,7 @@ namespace alg
 	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
     [[nodiscard]] constexpr auto none_of_n(Range&& range, size_t size, Pred f, Proj p = {}) -> bool
     {
-	return none_of_n(std::ranges::begin(range), size, std::move(f), std::move(p));
+	return none_of_n(std::begin(range), size, std::move(f), std::move(p));
     }
 
 
@@ -532,8 +532,8 @@ namespace alg
     [[nodiscard]] constexpr auto find_first_of(Range1&& range1, Range2&& range2,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {}) -> std::ranges::borrowed_iterator_t<Range1> 
     {
-	return find_first_of(std::ranges::begin(range1), std::ranges::end(range1),
-		std::ranges::begin(range2), std::ranges::end(range2),
+	return find_first_of(std::begin(range1), std::end(range1),
+		std::begin(range2), std::end(range2),
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -567,8 +567,8 @@ namespace alg
     [[nodiscard]] constexpr auto find_first_of_n(Range1&& range1, size_t size1, Range2&& range2, size_t size2,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {}) -> std::ranges::borrowed_iterator_t<Range1> 
     {
-	return find_first_of_n(std::ranges::begin(range1), size1,
-		std::ranges::begin(range2), size2,
+	return find_first_of_n(std::begin(range1), size1,
+		std::begin(range2), size2,
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -601,8 +601,8 @@ namespace alg
     [[nodiscard]] constexpr auto starts_with(Range1&& range1, Range2&& range2,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {})
     {
-	return starts_with(std::ranges::begin(range1), std::ranges::end(range1),
-		std::ranges::begin(range2), std::ranges::end(range2),
+	return starts_with(std::begin(range1), std::end(range1),
+		std::begin(range2), std::end(range2),
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -635,8 +635,8 @@ namespace alg
     [[nodiscard]] constexpr auto starts_with_n(Range1&& range1, Range2&& range2, size_t size,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {})
     {
-	return starts_with_n(std::ranges::begin(range1),
-		std::ranges::begin(range2), size,
+	return starts_with_n(std::begin(range1),
+		std::begin(range2), size,
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -675,8 +675,8 @@ namespace alg
     [[nodiscard]] constexpr auto ends_with(Range1&& range1, Range2&& range2,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {})
     {
-	return ends_with(std::ranges::begin(range1), std::ranges::end(range1),
-		std::ranges::begin(range2), std::ranges::end(range2),
+	return ends_with(std::begin(range1), std::end(range1),
+		std::begin(range2), std::end(range2),
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -696,8 +696,7 @@ namespace alg
 
 	std::advance(left1, size1 - size2);
 	// size1 = size1 - (size1 - size2) = size1 - size1 + size2 = size2
-	return equal_n(std::move(left1), size2,
-		std::move(left2), size2,
+	return equal_n(std::move(left1), std::move(left2), size2,
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -709,8 +708,8 @@ namespace alg
     [[nodiscard]] constexpr auto ends_with_n(Range1&& range1, size_t size1, Range2&& range2, size_t size2,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {})
     {
-	return ends_with_n(std::ranges::begin(range1), size1,
-		std::ranges::begin(range2), size2,
+	return ends_with_n(std::begin(range1), size1,
+		std::begin(range2), size2,
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -742,7 +741,7 @@ namespace alg
     [[nodiscard]] constexpr auto adjacent_find(Range&& range, Pred f = {}, Proj p = {})
 	-> std::ranges::borrowed_iterator_t<Range>
     {
-	return adjacent_find(std::ranges::begin(range), std::ranges::end(range),
+	return adjacent_find(std::begin(range), std::end(range),
 		std::move(f), std::move(p));
     }
 
@@ -774,7 +773,7 @@ namespace alg
     [[nodiscard]] constexpr auto adjacent_find_n(Range&& range, size_t size, Pred f = {}, Proj p = {})
 	-> std::ranges::borrowed_iterator_t<Range>
     {
-	return adjacent_find_n(std::ranges::begin(range), size,
+	return adjacent_find_n(std::begin(range), size,
 		std::move(f), std::move(p));
     }
 
@@ -815,8 +814,8 @@ namespace alg
     [[nodiscard]] constexpr auto search(Range1&& range1, Range2&& range2,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {}) -> std::ranges::borrowed_subrange_t<Range1>
     {
-	return search(std::ranges::begin(range1), std::ranges::end(range1),
-		std::ranges::begin(range2), std::ranges::end(range2),
+	return search(std::begin(range1), std::end(range1),
+		std::begin(range2), std::end(range2),
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -861,7 +860,7 @@ namespace alg
     [[nodiscard]] constexpr auto search_n(Range&& range, std::ranges::range_difference_t<Range> count,
 	    const T& val, Pred f = {}, Proj p = {}) -> std::ranges::borrowed_subrange_t<Range>
     {
-	return search_n(std::ranges::begin(range), std::ranges::end(range), std::move(count),
+	return search_n(std::begin(range), std::end(range), std::move(count),
 		val, std::move(f), std::move(p));
     }
 
@@ -919,8 +918,8 @@ namespace alg
     [[nodiscard]] constexpr auto find_end(Range1&& range1, Range2&& range2,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {}) -> std::ranges::borrowed_subrange_t<Range1>
     {
-	return find_end(std::ranges::begin(range1), std::ranges::end(range1),
-		std::ranges::begin(range2), std::ranges::end(range2),
+	return find_end(std::begin(range1), std::end(range1),
+		std::begin(range2), std::end(range2),
 		std::move(f), std::move(p1), std::move(p2));
     }
 
@@ -1013,7 +1012,7 @@ namespace alg
     [[nodiscard]] constexpr auto find_end_n(Range&& range, std::ranges::range_difference_t<Range> count,
 	    const T& val, Pred f = {}, Proj p = {}) -> std::ranges::borrowed_subrange_t<Range>
     {
-	return find_end_n(std::ranges::begin(range), std::ranges::end(range), std::move(count),
+	return find_end_n(std::begin(range), std::end(range), std::move(count),
 		val, std::move(f), std::move(p));
     }
 
