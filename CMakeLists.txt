@@ -11,7 +11,7 @@ enable_testing()
 
 set(TEST_EXECUTABLE tests)
 
-set(SRC src/non_modifying.hpp src/comparison_operations.hpp)
+file(GLOB_RECURSE SRC LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/src/.hpp)
 file(GLOB_RECURSE NON_MOD_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/non_modifying/*.cpp)
 file(GLOB_RECURSE CMP_OP_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/comparison_operations/*.cpp)
 
