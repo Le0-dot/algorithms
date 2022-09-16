@@ -13,8 +13,8 @@ namespace concepts
 
     template<typename T>
     concept three_way_comparison_result = any_of<T, std::strong_ordering, 
-						       std::weak_ordering,
-						       std::partial_ordering>;
+						    std::weak_ordering,
+						    std::partial_ordering>;
 
     template<typename F, typename... Args>
     concept three_way_predicate = 
@@ -39,5 +39,6 @@ namespace concepts
 	indirect_three_way_binary_predicate<Comp,
 	    std::projected<Iter1, Proj1>,
 	    std::projected<Iter2, Proj2>>;
+
 
 }
