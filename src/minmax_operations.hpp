@@ -232,4 +232,19 @@ namespace alg
     }
 
 
+    //******************* clamp ***********************
+
+    template<typename T, 
+	typename Proj = std::identity,
+	std::indirect_strict_weak_order<std::projected<const T*, Proj>> Comp = std::ranges::less>
+    [[nodiscard]] constexpr auto clamp(const T& v, const T& l, const T& h, Comp f = {}, Proj p = {})
+    {
+	auto&& pv = std::invoke(p, v);
+
+	return std::invoke(f, std::forward<decltype(pv)>(pv), std::invoke(p, l)) ? l
+	     : std::invoke(f, std::invoke(p, h), std::forward<decltype(pv)>(pv)) ? h
+	     : v;
+    }
+
+
 }
