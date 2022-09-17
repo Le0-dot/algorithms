@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include "non_modifying.hpp"
+#include "non_modifying_operations.hpp"
 
 class find_end_n_test : public ::testing::Test
 {

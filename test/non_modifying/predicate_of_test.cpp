@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "non_modifying.hpp"
+#include "non_modifying_operations.hpp"
 
 class predicate_of_test : public ::testing::Test
 {
