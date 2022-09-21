@@ -11,11 +11,11 @@ enable_testing()
 
 set(TEST_EXECUTABLE tests)
 
-file(GLOB_RECURSE SRC LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/src/.hpp)
-file(GLOB_RECURSE NON_MOD_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/non_modifying_operations/*.cpp)
-file(GLOB_RECURSE MOD_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/modifying_operations/*.cpp)
-file(GLOB_RECURSE CMP_OP_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/comparison_operations/*.cpp)
-file(GLOB_RECURSE MINMAX_OP_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/minmax_operations/*.cpp)
+file(GLOB_RECURSE SRC LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/src/*)
+file(GLOB_RECURSE NON_MOD_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/non_modifying_operations/*)
+file(GLOB_RECURSE MOD_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/modifying_operations/*)
+file(GLOB_RECURSE CMP_OP_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/comparison_operations/*)
+file(GLOB_RECURSE MINMAX_OP_TESTS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/test/minmax_operations/*)
 
 add_executable(${TEST_EXECUTABLE} ${NON_MOD_TESTS} ${MOD_TESTS} ${CMP_OP_TESTS} ${MINMAX_OP_TESTS} ${SRC})
 
