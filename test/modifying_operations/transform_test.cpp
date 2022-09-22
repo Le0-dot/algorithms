@@ -10,10 +10,10 @@ class transform_test : public ::testing::Test
 protected:
     const std::vector<int> v1{1, 2, 3};
     std::vector<int> v2{0, 1, 2};
-    std::function<int(int)> f1 = [] (int i) { return i * i; };
-    std::function<int(int, int)> f2 = [] (int a, int b) { return a * a + b * b; };
-    std::function<int(int)> p1 = [] (int i) { return i / 2; };
-    std::function<int(int)> p2 = [] (int i) { return i + 1; };
+    const std::function<int(int)> f1 = [] (int i) { return i * i; };
+    const std::function<int(int, int)> f2 = [] (int a, int b) { return a * a + b * b; };
+    const std::function<int(int)> p1 = [] (int i) { return i / 2; };
+    const std::function<int(int)> p2 = [] (int i) { return i + 1; };
 };
 
 

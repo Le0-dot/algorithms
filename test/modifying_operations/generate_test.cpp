@@ -10,7 +10,7 @@ class generate_test : public ::testing::Test
 {
 protected:
     std::string s{"abc"};
-    std::function<char()> gen = [] () { return 'X'; };
+    const std::function<char()> gen = [] () { return 'X'; };
 };
 
 

@@ -595,4 +595,380 @@ namespace alg
     }
 
 
+    //****************** remove_copy ***********************
+
+    template<std::input_iterator Iter, std::sentinel_for<Iter> Sent,
+	std::weakly_incrementable Out,
+	typename T, typename Proj = std::identity>
+    requires std::indirectly_copyable<Iter, Out> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	std::projected<Iter, Proj>,
+	const T*>
+    constexpr auto remove_copy(Iter left, Sent right, Out out, const T& val, Proj p = {})
+	-> std::ranges::in_out_result<Iter, Out>
+    {
+	for(; left != right; ++left)
+	    if(val != std::invoke(p, *left))
+		*out++ = *left;
+
+	return {std::move(left), std::move(out)};
+    }
+
+    template<std::ranges::input_range Range,
+	std::weakly_incrementable Out,
+	typename T, typename Proj = std::identity>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<std::ranges::iterator_t<Range>, Proj>,
+	    const T*>
+    constexpr auto remove_copy(Range&& range, Out out, const T& val, Proj p = {})
+	-> std::ranges::in_out_result<std::ranges::iterator_t<Range>, Out>
+    {
+	return ::alg::remove_copy(std::begin(range), std::end(range), std::move(out), val, std::move(p));
+    }
+
+
+    //****************** remove_copy_n ***********************
+
+    template<std::input_iterator Iter,
+	std::weakly_incrementable Out,
+	typename T, typename Proj = std::identity>
+    requires std::indirectly_copyable<Iter, Out> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	std::projected<Iter, Proj>,
+	const T*>
+    constexpr auto remove_copy_n(Iter left, std::iter_difference_t<Iter> n, Out out, const T& val, Proj p = {})
+	-> std::ranges::in_out_result<Iter, Out>
+    {
+	for(std::iter_difference_t<Iter> i{}; i != n; ++i, ++left)
+	    if(val != std::invoke(p, *left))
+		*out++ = *left;
+
+	return {std::move(left), std::move(out)};
+ 
+    }
+
+    template<std::ranges::input_range Range,
+	std::weakly_incrementable Out,
+	typename T, typename Proj = std::identity>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<std::ranges::iterator_t<Range>, Proj>,
+	    const T*>
+    constexpr auto remove_copy_n(Range&& range, std::ranges::range_difference_t<Range> n, Out out, const T& val, Proj p = {})
+	-> std::ranges::in_out_result<std::ranges::iterator_t<Range>, Out>
+    {
+	return remove_copy_n(std::begin(range), n, std::move(out), val, std::move(p));
+    }
+
+    
+    //***************** remove_copy_if *********************
+
+    template<std::input_iterator Iter, std::sentinel_for<Iter> Sent,
+	std::weakly_incrementable Out,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<Iter, Proj>> Pred>
+    requires std::indirectly_copyable<Iter, Out>
+    constexpr auto remove_copy_if(Iter left, Sent right, Out out, Pred f, Proj p = {})
+	-> std::ranges::in_out_result<Iter, Out>
+    {
+	for(; left != right; ++left)
+	    if(!std::invoke(f, std::invoke(p, *left)))
+		*out++ = *left;
+
+	return {std::move(left), std::move(out)};
+    }
+
+    template<std::ranges::input_range Range,
+	std::weakly_incrementable Out,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out>
+    constexpr auto remove_copy_if(Range&& range, Out out, Pred f, Proj p = {})
+	-> std::ranges::in_out_result<std::ranges::iterator_t<Range>, Out>
+    {
+	return ::alg::remove_copy_if(std::begin(range), std::end(range), std::move(out), f, std::move(p));
+    }
+
+
+    //**************** remove_copy_if_n **********************
+
+    template<std::input_iterator Iter,
+	std::weakly_incrementable Out,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<Iter, Proj>> Pred>
+    requires std::indirectly_copyable<Iter, Out>
+    constexpr auto remove_copy_if_n(Iter left, std::iter_difference_t<Iter> n,
+	Out out, Pred f, Proj p = {})
+	-> std::ranges::in_out_result<Iter, Out>
+    {
+	for(std::iter_difference_t<Iter> i{}; i != n; ++i, ++left)
+	    if(!std::invoke(f, std::invoke(p, *left)))
+		*out++ = *left;
+
+	return {std::move(left), std::move(out)};
+ 
+    }
+
+    template<std::ranges::input_range Range,
+	std::weakly_incrementable Out,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out>
+    constexpr auto remove_copy_if_n(Range&& range, std::ranges::range_difference_t<Range> n,
+	Out out, Pred f, Proj p = {})
+	-> std::ranges::in_out_result<std::ranges::iterator_t<Range>, Out>
+    {
+	return remove_copy_if_n(std::begin(range), n, std::move(out), f, std::move(p));
+    }
+
+
+    //********************* replace **************************
+
+    template<std::input_iterator Iter, std::sentinel_for<Iter> Sent,
+	typename Old, typename New,
+	typename Proj = std::identity>
+    requires std::indirectly_writable<Iter, const New&> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<Iter, Proj>,
+	    const Old*>
+    constexpr auto replace(Iter left, Sent right, const Old& old, const New& val, Proj p = {})
+    {
+	for(; left != right; ++left)
+	    if(old == std::invoke(p, *left))
+		*left = val;
+
+	return left;
+    }
+
+    template<std::ranges::input_range Range,
+	typename Old, typename New,
+	typename Proj = std::identity>
+    requires std::indirectly_writable<std::ranges::iterator_t<Range>, const New&> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<std::ranges::iterator_t<Range>, Proj>,
+	    const Old*>
+    constexpr auto replace(Range&& range, const Old& old, const New& val, Proj p = {})
+    {
+	return ::alg::replace(std::begin(range), std::end(range), old, val, std::move(p));
+    }
+
+
+    //******************** replace_n *************************
+
+    template<std::input_iterator Iter,
+	typename Old, typename New,
+	typename Proj = std::identity>
+    requires std::indirectly_writable<Iter, const New&> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<Iter, Proj>,
+	    const Old*>
+    constexpr auto replace_n(Iter left, std::iter_difference_t<Iter> n, const Old& old, const New& val, Proj p = {})
+    {
+	for(std::iter_difference_t<Iter> i{}; i != n; ++i, ++left)
+	    if(old == std::invoke(p, *left))
+		*left = val;
+
+	return left;
+    }
+
+    template<std::ranges::input_range Range,
+	typename Old, typename New,
+	typename Proj = std::identity>
+    requires std::indirectly_writable<std::ranges::iterator_t<Range>, const New&> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<std::ranges::iterator_t<Range>, Proj>,
+	    const Old*>
+    constexpr auto replace_n(Range&& range, std::ranges::range_difference_t<Range> n, const Old& old, const New& val, Proj p = {})
+    {
+	return ::alg::replace_n(std::begin(range), std::move(n), old, val, std::move(p));
+    }
+
+
+    //******************* replace_if *************************
+
+    template<std::input_iterator Iter, std::sentinel_for<Iter> Sent,
+	typename New,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<Iter, Proj>> Pred>
+    requires std::indirectly_writable<Iter, const New&>
+    constexpr auto replace_if(Iter left, Sent right, Pred f, const New& val, Proj p = {})
+    {
+	for(; left != right; ++left)
+	    if(std::invoke(f, std::invoke(p, *left)))
+		*left = val;
+
+	return left;
+    }
+
+    template<std::ranges::input_range Range,
+	typename New,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
+    requires std::indirectly_writable<std::ranges::iterator_t<Range>, const New&>
+    constexpr auto replace_if(Range&& range, Pred f, const New& val, Proj p = {})
+    {
+	return ::alg::replace_if(std::begin(range), std::end(range), std::move(f), val, std::move(p));
+    }
+
+
+    //****************** replace_if_n ************************
+
+    template<std::input_iterator Iter,
+	typename New,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<Iter, Proj>> Pred>
+    requires std::indirectly_writable<Iter, const New&>
+    constexpr auto replace_if_n(Iter left, std::iter_difference_t<Iter> n, Pred f, const New& val, Proj p = {})
+    {
+	for(std::iter_difference_t<Iter> i{}; i != n; ++i, ++left)
+	    if(std::invoke(f, std::invoke(p, *left)))
+		*left = val;
+
+	return left;
+    }
+
+    template<std::ranges::input_range Range,
+	typename New,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
+    requires std::indirectly_writable<std::ranges::iterator_t<Range>, const New&>
+    constexpr auto replace_if_n(Range&& range, std::ranges::range_difference_t<Range> n, Pred f, const New& val, Proj p = {})
+    {
+	return ::alg::replace_if_n(std::begin(range), std::move(n), std::move(f), val, std::move(p));
+    }
+
+
+    //********************* replace_copy **************************
+
+    template<std::input_iterator Iter, std::sentinel_for<Iter> Sent,
+	typename Old, typename New,
+	std::output_iterator<const New&> Out,
+	typename Proj = std::identity>
+    requires std::indirectly_copyable<Iter, Out> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<Iter, Proj>,
+	    const Old*>
+    constexpr auto replace_copy(Iter left, Sent right, Out out, const Old& old, const New& val, Proj p = {})
+	-> std::ranges::in_out_result<Iter, Out>
+    {
+	for(; left != right; ++left, ++out)
+	    *out = (old == std::invoke(p, *left)) ? val : *left;
+
+	return {std::move(left), std::move(out)};
+    }
+
+    template<std::ranges::input_range Range,
+	typename Old, typename New,
+	std::output_iterator<const New&> Out,
+	typename Proj = std::identity>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<std::ranges::iterator_t<Range>, Proj>,
+	    const Old*>
+    constexpr auto replace_copy(Range&& range, Out out, const Old& old, const New& val, Proj p = {})
+	-> std::ranges::in_out_result<std::ranges::borrowed_iterator_t<Range>, Out>
+    {
+	return ::alg::replace_copy(std::begin(range), std::end(range), std::move(out), old, val, std::move(p));
+    }
+
+
+    //******************** replace_copy_n *************************
+
+    template<std::input_iterator Iter,
+	typename Old, typename New,
+	std::output_iterator<const New&> Out,
+	typename Proj = std::identity>
+    requires std::indirectly_copyable<Iter, Out> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<Iter, Proj>,
+	    const Old*>
+    constexpr auto replace_copy_n(Iter left, std::iter_difference_t<Iter> n,
+	    Out out, const Old& old, const New& val, Proj p = {})
+	-> std::ranges::in_out_result<Iter, Out>
+    {
+	for(std::iter_difference_t<Iter> i{}; i != n; ++i, ++left, ++out)
+	    *out = (old == std::invoke(p, *left)) ? val : *left;
+
+	return {std::move(left), std::move(out)};
+    }
+
+    template<std::ranges::input_range Range,
+	typename Old, typename New,
+	std::output_iterator<const New&> Out,
+	typename Proj = std::identity>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out> &&
+	std::indirect_binary_predicate<std::ranges::equal_to,
+	    std::projected<std::ranges::iterator_t<Range>, Proj>,
+	    const Old*>
+    constexpr auto replace_copy_n(Range&& range, std::ranges::range_difference_t<Range> n,
+	    Out out, const Old& old, const New& val, Proj p = {})
+	-> std::ranges::in_out_result<std::ranges::borrowed_iterator_t<Range>, Out>
+    {
+	return ::alg::replace_copy_n(std::begin(range), std::move(n), std::move(out), old, val, std::move(p));
+    }
+
+
+    //******************* replace_copy_if *************************
+
+    template<std::input_iterator Iter, std::sentinel_for<Iter> Sent,
+	typename New,
+	std::output_iterator<const New&> Out,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<Iter, Proj>> Pred>
+    requires std::indirectly_copyable<Iter, Out>
+    constexpr auto replace_copy_if(Iter left, Sent right, Out out, Pred f, const New& val, Proj p = {})
+	-> std::ranges::in_out_result<Iter, Out>
+    {
+	for(; left != right; ++left, ++out)
+	    *out = std::invoke(f, std::invoke(p, *left)) ? val : *left;
+
+	return {std::move(left), std::move(out)};
+    }
+
+    template<std::ranges::input_range Range,
+	typename New,
+	std::output_iterator<const New&> Out,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out>
+    constexpr auto replace_copy_if(Range&& range, Out out, Pred f, const New& val, Proj p = {})
+	-> std::ranges::in_out_result<std::ranges::borrowed_iterator_t<Range>, Out>
+    {
+	return ::alg::replace_copy_if(std::begin(range), std::end(range), std::move(out), std::move(f), val, std::move(p));
+    }
+
+
+    //****************** replace_copy_if_n ************************
+
+    template<std::input_iterator Iter,
+	typename New,
+	std::output_iterator<const New&> Out,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<Iter, Proj>> Pred>
+    requires std::indirectly_copyable<Iter, Out>
+    constexpr auto replace_copy_if_n(Iter left, std::iter_difference_t<Iter> n,
+	    Out out, Pred f, const New& val, Proj p = {})
+	-> std::ranges::in_out_result<Iter, Out>
+    {
+	for(std::iter_difference_t<Iter> i{}; i != n; ++i, ++left, ++out)
+	    *out = std::invoke(f, std::invoke(p, *left)) ? val : *left;
+
+	return {std::move(left), std::move(out)};
+    }
+
+    template<std::ranges::input_range Range,
+	typename New,
+	std::output_iterator<const New&> Out,
+	typename Proj = std::identity,
+	std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<Range>, Proj>> Pred>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out>
+    constexpr auto replace_copy_if_n(Range&& range, std::ranges::range_difference_t<Range> n,
+	    Out out, Pred f, const New& val, Proj p = {})
+	-> std::ranges::in_out_result<std::ranges::borrowed_iterator_t<Range>, Out>
+    {
+	return ::alg::replace_copy_if_n(std::begin(range), std::move(n), std::move(out), std::move(f), val, std::move(p));
+    }
+
+
 }

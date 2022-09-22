@@ -10,7 +10,7 @@ class remove_test : public ::testing::Test
 protected:
     std::vector<int> v{1, 2, 3, 2};
     const int i = 2; 
-    std::function<int(int)> p = [] (int i) { return i - 1; };
+    const std::function<int(int)> p = [] (int i) { return i - 1; };
 };
 
 
