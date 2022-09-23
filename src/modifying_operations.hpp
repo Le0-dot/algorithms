@@ -4,6 +4,7 @@
 #include <ranges>
 #include <iterator>
 #include <algorithm>
+#include <cmath>
 
 #include "non_modifying_operations.hpp"
 
@@ -1099,6 +1100,60 @@ namespace alg
 	-> std::ranges::in_out_result<std::ranges::iterator_t<Range>, Out>
     {
 	return reverse_copy_n(std::begin(range), std::move(n), std::move(out));
+    }
+
+
+    //********************** shift_left ***************************
+
+    template<std::permutable Iter, std::sentinel_for<Iter> Sent>
+    constexpr auto shift_left(Iter left, Sent right, std::iter_difference_t<Iter> n)
+	-> std::ranges::subrange<Iter> 
+    {
+	if(n >= std::distance(left, right) || !n)
+	    return {left, left};
+
+	auto beginning{std::ranges::next(left, n)};
+
+	auto ret = ::alg::move(beginning, std::move(right), left);
+
+	return {std::move(left), std::move(ret.out)};
+    }
+
+    template<std::ranges::forward_range Range>
+    requires std::permutable<std::ranges::iterator_t<Range>>
+    constexpr auto shift_left(Range&& range, std::ranges::range_difference_t<Range> n)
+	-> std::ranges::borrowed_subrange_t<Range>
+    {
+	return ::alg::shift_left(std::begin(range), std::end(range), std::move(n));
+    }
+
+
+    //********************** shift_right ***************************
+
+    // TODO: add support for forward ranges
+
+    template<std::bidirectional_iterator Iter, std::sentinel_for<Iter> Sent>
+    requires std::permutable<Iter>
+    constexpr auto shift_right(Iter left, Sent right, std::iter_difference_t<Iter> n)
+	-> std::ranges::subrange<Iter>
+    {
+	auto len{std::distance(left, right)};
+
+	if(n >= len || !n)
+	    return {right, right};
+
+	auto ending{std::ranges::next(left, len - n)};
+	auto beginning = std::ranges::next(left, right);
+	auto ret = ::alg::move_backwards(std::move(left), std::move(ending), beginning);
+	return {std::move(ret.out), std::move(right)};
+    }
+
+    template<std::ranges::bidirectional_range Range>
+    requires std::permutable<std::ranges::iterator_t<Range>>
+    constexpr auto shift_right(Range&& range, std::ranges::range_difference_t<Range> n)
+	-> std::ranges::borrowed_subrange_t<Range>
+    {
+	return ::alg::shift_right(std::begin(range), std::end(range), std::move(n));
     }
 
 
