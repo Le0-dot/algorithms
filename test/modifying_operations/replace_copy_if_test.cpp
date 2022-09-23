@@ -28,7 +28,7 @@ TEST_F(replace_copy_if_test, BasicTest)
 {
     auto res = alg::replace_copy_if(std::begin(v1), std::end(v1), std::back_inserter(v2), i, j);
 
-    EXPECT_EQ(v2, (std::vector<int>{1, 4, 3, 4}));
+    EXPECT_EQ(v2, (std::vector{1, 4, 3, 4}));
     EXPECT_EQ(res.in, std::end(v1));
 }
 
@@ -36,7 +36,7 @@ TEST_F(replace_copy_if_test, RangeTest)
 {
     auto res = alg::replace_copy_if(v1, std::back_inserter(v2), i, j);
 
-    EXPECT_EQ(v2, (std::vector<int>{1, 4, 3, 4}));
+    EXPECT_EQ(v2, (std::vector{1, 4, 3, 4}));
     EXPECT_EQ(res.in, std::end(v1));
 }
 
@@ -44,7 +44,7 @@ TEST_F(replace_copy_if_test, ProjectionTest)
 {
     auto res = alg::replace_copy_if(v1, std::back_inserter(v2), i, j, p);
 
-    EXPECT_EQ(v2, (std::vector<int>{1, 2, 4, 2}));
+    EXPECT_EQ(v2, (std::vector{1, 2, 4, 2}));
     EXPECT_EQ(res.in, std::end(v1));
 }
 
@@ -60,7 +60,7 @@ TEST_F(replace_copy_if_test, BasicTestN)
 {
     auto res = alg::replace_copy_if_n(std::begin(v1), std::size(v1), std::back_inserter(v2), i, j);
 
-    EXPECT_EQ(v2, (std::vector<int>{1, 4, 3, 4}));
+    EXPECT_EQ(v2, (std::vector{1, 4, 3, 4}));
     EXPECT_EQ(res.in, std::end(v1));
 }
 
@@ -68,7 +68,7 @@ TEST_F(replace_copy_if_test, RangeTestN)
 {
     auto res = alg::replace_copy_if_n(v1, std::size(v1), std::back_inserter(v2), i, j);
 
-    EXPECT_EQ(v2, (std::vector<int>{1, 4, 3, 4}));
+    EXPECT_EQ(v2, (std::vector{1, 4, 3, 4}));
     EXPECT_EQ(res.in, std::end(v1));
 }
 
@@ -76,6 +76,6 @@ TEST_F(replace_copy_if_test, ProjectionTestN)
 {
     auto res = alg::replace_copy_if_n(v1, std::size(v1), std::back_inserter(v2), i, j, p);
 
-    EXPECT_EQ(v2, (std::vector<int>{1, 2, 4, 2}));
+    EXPECT_EQ(v2, (std::vector{1, 2, 4, 2}));
     EXPECT_EQ(res.in, std::end(v1));
 }

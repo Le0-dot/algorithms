@@ -876,6 +876,15 @@ namespace alg
     [[nodiscard]] constexpr auto find_end(Iter1 left1, Sent1 right1, Iter2 left2, Sent2 right2,
 	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {}) -> std::ranges::subrange<Iter1>
     {
+	if constexpr(std::bidirectional_iterator<Iter1> && std::bidirectional_iterator<Iter2>) {
+
+	    auto reverse = search(std::reverse_iterator(right1), std::reverse_iterator(left1),
+		    std::reverse_iterator(right2), std::reverse_iterator(left2),
+		    std::move(f), std::move(p1), std::move(p2));
+	    return {std::end(reverse).base(), std::begin(reverse).base()};
+
+	}
+
 	if(left2 == right2) {
 	    auto last = std::ranges::next(left1, right1);
 	    return {last, last};
@@ -889,21 +898,6 @@ namespace alg
 	} while(!new_result.empty());
 
 	return result;
-    }
-
-    template<std::bidirectional_iterator Iter1, std::sentinel_for<Iter1> Sent1,
-	std::bidirectional_iterator Iter2, std::sentinel_for<Iter2> Sent2,
-	typename Pred = std::ranges::equal_to,
-	typename Proj1 = std::identity,
-	typename Proj2 = std::identity>
-    requires std::indirectly_comparable<Iter1, Iter2, Pred, Proj1, Proj2>
-    [[nodiscard]] constexpr auto find_end(Iter1 left1, Sent1 right1, Iter2 left2, Sent2 right2,
-	    Pred f = {}, Proj1 p1 = {}, Proj2 p2 = {}) -> std::ranges::subrange<Iter1>
-    {
-	auto reverse = search(std::reverse_iterator(right1), std::reverse_iterator(left1),
-		std::reverse_iterator(right2), std::reverse_iterator(left2),
-		std::move(f), std::move(p1), std::move(p2));
-	return {std::end(reverse).base(), std::begin(reverse).base()};
     }
 
     template<std::ranges::forward_range Range1,
@@ -935,6 +929,43 @@ namespace alg
     [[nodiscard]] constexpr auto find_end_n(Iter1 left, Iter2 right, std::iter_difference_t<Iter1> count,
 	    const T& val, Pred f = {}, Proj p = {}) -> std::ranges::subrange<Iter1>
     {
+	if constexpr(std::random_access_iterator<Iter1> && std::random_access_iterator<Iter2>) {
+	    auto last = std::ranges::next(left, right);
+
+	    if(count <= 0)
+		return {last, last};
+
+	    if(std::distance(left, right) == 0)
+		return {left, left};
+
+	    last = std::prev(last);
+
+	    for(; last != left; --last) {
+		if(std::invoke(f, std::invoke(p, *last), val)) {
+		    auto end = last;
+		    std::iter_difference_t<Iter1> n{1};
+		    for(;;) {
+			if(n++ == count)
+			    return {last, std::next(end)};
+			if(--last == left)
+			    return {last, last};
+			if(!std::invoke(f, std::invoke(p, *last), val))
+			    break;
+		    }
+		}
+	    }
+
+	    return {left, left};
+	} 
+
+	if constexpr(std::bidirectional_iterator<Iter1> && std::bidirectional_iterator<Iter2>) {
+
+	    auto reverse = alg::search_n(std::reverse_iterator(right), std::reverse_iterator(left),
+		    std::move(count), val, std::move(f), std::move(p));
+	    return {std::end(reverse).base(), std::begin(reverse).base()};
+
+	}
+
 	if(count <= 0) {
 	    auto last = std::ranges::next(left, right);
 	    return {last, last};
@@ -951,57 +982,6 @@ namespace alg
 	if(std::begin(result) == right)
 	    return {left, left};
 	return result;
-    }
-
-    template<std::bidirectional_iterator Iter1,
-	std::sentinel_for<Iter1> Iter2,
-	typename T,
-	typename Pred = std::ranges::equal_to,
-	typename Proj = std::identity>
-    requires std::indirectly_comparable<Iter1, const T*, Pred, Proj>
-    [[nodiscard]] constexpr auto find_end_n(Iter1 left, Iter2 right, std::iter_difference_t<Iter1> count,
-	    const T& val, Pred f = {}, Proj p = {}) -> std::ranges::subrange<Iter1>
-    {
-	auto reverse = alg::search_n(std::reverse_iterator(right), std::reverse_iterator(left),
-		std::move(count), val, std::move(f), std::move(p));
-	return {std::end(reverse).base(), std::begin(reverse).base()};
-    }
-    
-    template<std::random_access_iterator Iter1,
-	std::sentinel_for<Iter1> Iter2,
-	typename T,
-	typename Pred = std::ranges::equal_to,
-	typename Proj = std::identity>
-    requires std::indirectly_comparable<Iter1, const T*, Pred, Proj>
-    [[nodiscard]] constexpr auto find_end_n(Iter1 left, Iter2 right, std::iter_difference_t<Iter1> count,
-	    const T& val, Pred f = {}, Proj p = {}) -> std::ranges::subrange<Iter1>
-    {
-	auto last = std::ranges::next(left, right);
-
-	if(count <= 0)
-	    return {last, last};
-
-	if(std::distance(left, right) == 0)
-	    return {left, left};
-
-	last = std::prev(last);
-
-	for(; last != left; --last) {
-	    if(std::invoke(f, std::invoke(p, *last), val)) {
-		auto end = last;
-		std::iter_difference_t<Iter1> n{1};
-		for(;;) {
-		    if(n++ == count)
-			return {last, std::next(end)};
-		    if(--last == left)
-			return {last, last};
-		    if(!std::invoke(f, std::invoke(p, *last), val))
-			break;
-		}
-	    }
-	}
-
-	return {left, left};
     }
 
     template<std::ranges::forward_range Range,

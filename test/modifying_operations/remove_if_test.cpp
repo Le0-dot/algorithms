@@ -20,7 +20,7 @@ TEST_F(remove_if_test, EmptyRange)
     v.erase(std::begin(res), std::end(res));
 
     EXPECT_EQ(std::size(v), 4);
-    EXPECT_EQ(v, (std::vector<int>{1, 2, 3, 2}));
+    EXPECT_EQ(v, (std::vector{1, 2, 3, 2}));
 }
 
 TEST_F(remove_if_test, BasicTest)
@@ -29,7 +29,7 @@ TEST_F(remove_if_test, BasicTest)
     v.erase(std::begin(res), std::end(res));
 
     EXPECT_EQ(std::size(v), 2);
-    EXPECT_EQ(v, (std::vector<int>{1, 3}));
+    EXPECT_EQ(v, (std::vector{1, 3}));
 }
 
 TEST_F(remove_if_test, RangeTest)
@@ -38,7 +38,7 @@ TEST_F(remove_if_test, RangeTest)
     v.erase(std::begin(res), std::end(res));
 
     EXPECT_EQ(std::size(v), 2);
-    EXPECT_EQ(v, (std::vector<int>{1, 3}));
+    EXPECT_EQ(v, (std::vector{1, 3}));
 }
 
 TEST_F(remove_if_test, ProjectionTest)
@@ -47,7 +47,7 @@ TEST_F(remove_if_test, ProjectionTest)
     v.erase(std::begin(res), std::end(res));
 
     EXPECT_EQ(std::size(v), 2);
-    EXPECT_EQ(v, (std::vector<int>{2, 2}));
+    EXPECT_EQ(v, (std::vector{2, 2}));
 }
 
 TEST_F(remove_if_test, EmptyRangeN)
@@ -56,7 +56,7 @@ TEST_F(remove_if_test, EmptyRangeN)
     v.erase(std::begin(res), std::end(res));
 
     EXPECT_EQ(std::size(v), 4);
-    EXPECT_EQ(v, (std::vector<int>{1, 2, 3, 2}));
+    EXPECT_EQ(v, (std::vector{1, 2, 3, 2}));
 }
 
 TEST_F(remove_if_test, BasicTestN)
@@ -65,7 +65,7 @@ TEST_F(remove_if_test, BasicTestN)
     v.erase(std::begin(res), std::end(res));
 
     EXPECT_EQ(std::size(v), 2);
-    EXPECT_EQ(v, (std::vector<int>{1, 3}));
+    EXPECT_EQ(v, (std::vector{1, 3}));
 }
 
 TEST_F(remove_if_test, RangeTestN)
@@ -74,7 +74,7 @@ TEST_F(remove_if_test, RangeTestN)
     v.erase(std::begin(res), std::end(res));
 
     EXPECT_EQ(std::size(v), 2);
-    EXPECT_EQ(v, (std::vector<int>{1, 3}));
+    EXPECT_EQ(v, (std::vector{1, 3}));
 }
 
 TEST_F(remove_if_test, ProjectionTestN)
@@ -83,5 +83,5 @@ TEST_F(remove_if_test, ProjectionTestN)
     v.erase(std::begin(res), std::end(res));
 
     EXPECT_EQ(std::size(v), 2);
-    EXPECT_EQ(v, (std::vector<int>{2, 2}));
+    EXPECT_EQ(v, (std::vector{2, 2}));
 }
