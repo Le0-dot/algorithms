@@ -4,9 +4,9 @@
 #include <ranges>
 #include <iterator>
 #include <algorithm>
-#include <cmath>
 
 #include "non_modifying_operations.hpp"
+#include "minmax_operations.hpp"
 
 namespace alg
 {
@@ -1154,6 +1154,91 @@ namespace alg
 	-> std::ranges::borrowed_subrange_t<Range>
     {
 	return ::alg::shift_right(std::begin(range), std::end(range), std::move(n));
+    }
+
+
+    //************************ shuffle *****************************
+
+    template<std::random_access_iterator Iter, std::sentinel_for<Iter> Sent,
+	typename Gen>
+    requires std::permutable<Iter> && 
+	std::uniform_random_bit_generator<std::remove_reference_t<Gen>>
+    constexpr auto shuffle(Iter left, Sent right, Gen&& gen) -> Iter
+    {
+	using diff_t = std::iter_difference_t<Iter>;
+	using distr_t = std::uniform_int_distribution<diff_t>;
+	using param_t = typename distr_t::param_type;
+
+	distr_t distr;
+	const auto n{std::distance(left, right)};
+	for(diff_t i{1}; i < n; ++i)
+	    ::alg::iter_swap(left + i, left + distr(gen, param_t{0, i}));
+
+	return std::ranges::next(left, right);
+    }
+
+    template<std::ranges::random_access_range Range,
+	typename Gen>
+    requires std::permutable<std::ranges::iterator_t<Range>> && 
+	std::uniform_random_bit_generator<std::remove_reference_t<Gen>>
+    constexpr auto shuffle(Range&& range, Gen&& gen) -> std::ranges::borrowed_iterator_t<Range>
+    {
+	return ::alg::shuffle(std::begin(range), std::end(range), std::forward<Gen>(gen));
+    }
+
+
+    //************************* sample *****************************
+
+    template<std::input_iterator Iter, std::sentinel_for<Iter> Sent,
+	std::weakly_incrementable Out, typename Gen>
+    requires (std::forward_iterator<Iter> ||
+	    std::random_access_iterator<Out>) &&
+	std::indirectly_copyable<Iter, Out> &&
+	std::uniform_random_bit_generator<std::remove_reference_t<Gen>>
+    constexpr auto sample(Iter left, Sent right, Out out, std::iter_difference_t<Iter> n, Gen&& gen) -> Out
+    {
+	using diff_t = std::iter_difference_t<Iter>;
+	using distr_t = std::uniform_int_distribution<diff_t>;
+	using param_t = typename distr_t::param_type;
+
+	distr_t distr;
+
+	if constexpr(std::forward_iterator<Iter>) {
+
+	    auto rest{std::distance(left, right)};    
+	    for(n = min(n, rest); n != 0; ++left)
+		if(distr(gen, param_t{0, --rest}) < n) {
+		    *out++ = *left;
+		    --n;
+		}
+
+	    return out;
+
+	} else {
+
+	    diff_t sample_s{};
+
+	    for(; left != right && sample_s != n; ++left)
+		out[sample_s++] = *left;
+
+	    for(auto pop_s{sample_s}; left != right; ++left, ++pop_s)
+		if(const auto i{distr(gen, param_t{0, pop_s})}; i < n)
+		    out[i] = *left;
+
+	    return out + sample_s;
+
+	}
+    }
+
+    template<std::ranges::input_range Range,
+	std::weakly_incrementable Out, typename Gen>
+    requires (std::forward_iterator<std::ranges::iterator_t<Range>> ||
+	    std::random_access_iterator<Out>) &&
+	std::indirectly_copyable<std::ranges::iterator_t<Range>, Out> &&
+	std::uniform_random_bit_generator<std::remove_reference_t<Gen>>
+    constexpr auto sample(Range&& range, Out out, std::ranges::range_difference_t<Range> n, Gen&& gen) -> Out
+    {
+	return ::alg::sample(std::begin(range), std::end(range), std::move(out), n, std::forward<Gen>(gen));
     }
 
 
