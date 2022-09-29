@@ -990,7 +990,7 @@ namespace alg
 	-> std::ranges::in_in_result<Iter1, Iter2>
     {
 	for(; left1 != right1 && left2 != right2; ++left1, ++left2)
-	    iter_swap(left1, left2);
+	    ::alg::iter_swap(left1, left2);
 
 	return {std::move(left1), std::move(left2)};
     }
@@ -1017,7 +1017,7 @@ namespace alg
 	auto last{std::ranges::next(left, right)};
 
 	for(auto tail{last}; left != tail && left != --tail; ++left)
-	    iter_swap(left, tail);
+	    ::alg::iter_swap(left, tail);
 
 	return last;
     }
@@ -1039,7 +1039,7 @@ namespace alg
 	auto last{std::ranges::next(left, n)};
 
 	for(auto tail{last}; left != tail && left != --tail; ++left)
-	    iter_swap(left, tail);
+	    ::alg::iter_swap(left, tail);
 
 	return last;
     }
@@ -1048,7 +1048,7 @@ namespace alg
     requires std::permutable<std::ranges::iterator_t<Range>>
     constexpr auto reverse_n(Range&& range, std::ranges::range_difference_t<Range> n) -> std::ranges::borrowed_iterator_t<Range>
     {
-	return reverse_n(std::begin(range), std::move(n));
+	return ::alg::reverse_n(std::begin(range), std::move(n));
     }
 
 
@@ -1099,61 +1099,7 @@ namespace alg
     constexpr auto reverse_copy_n(Range&& range, std::ranges::range_difference_t<Range> n, Out out) 
 	-> std::ranges::in_out_result<std::ranges::iterator_t<Range>, Out>
     {
-	return reverse_copy_n(std::begin(range), std::move(n), std::move(out));
-    }
-
-
-    //********************** shift_left ***************************
-
-    template<std::permutable Iter, std::sentinel_for<Iter> Sent>
-    constexpr auto shift_left(Iter left, Sent right, std::iter_difference_t<Iter> n)
-	-> std::ranges::subrange<Iter> 
-    {
-	if(n >= std::distance(left, right) || !n)
-	    return {left, left};
-
-	auto beginning{std::ranges::next(left, n)};
-
-	auto ret = ::alg::move(beginning, std::move(right), left);
-
-	return {std::move(left), std::move(ret.out)};
-    }
-
-    template<std::ranges::forward_range Range>
-    requires std::permutable<std::ranges::iterator_t<Range>>
-    constexpr auto shift_left(Range&& range, std::ranges::range_difference_t<Range> n)
-	-> std::ranges::borrowed_subrange_t<Range>
-    {
-	return ::alg::shift_left(std::begin(range), std::end(range), std::move(n));
-    }
-
-
-    //********************** shift_right ***************************
-
-    // TODO: add support for forward ranges
-
-    template<std::bidirectional_iterator Iter, std::sentinel_for<Iter> Sent>
-    requires std::permutable<Iter>
-    constexpr auto shift_right(Iter left, Sent right, std::iter_difference_t<Iter> n)
-	-> std::ranges::subrange<Iter>
-    {
-	auto len{std::distance(left, right)};
-
-	if(n >= len || !n)
-	    return {right, right};
-
-	auto ending{std::ranges::next(left, len - n)};
-	auto beginning = std::ranges::next(left, right);
-	auto ret = ::alg::move_backwards(std::move(left), std::move(ending), beginning);
-	return {std::move(ret.out), std::move(right)};
-    }
-
-    template<std::ranges::bidirectional_range Range>
-    requires std::permutable<std::ranges::iterator_t<Range>>
-    constexpr auto shift_right(Range&& range, std::ranges::range_difference_t<Range> n)
-	-> std::ranges::borrowed_subrange_t<Range>
-    {
-	return ::alg::shift_right(std::begin(range), std::end(range), std::move(n));
+	return ::alg::reverse_copy_n(std::begin(range), std::move(n), std::move(out));
     }
 
 
@@ -1239,6 +1185,228 @@ namespace alg
     constexpr auto sample(Range&& range, Out out, std::ranges::range_difference_t<Range> n, Gen&& gen) -> Out
     {
 	return ::alg::sample(std::begin(range), std::end(range), std::move(out), n, std::forward<Gen>(gen));
+    }
+
+
+    //************************* unique *****************************
+
+    template<std::permutable Iter, std::sentinel_for<Iter> Sent,
+	typename Proj = std::identity,
+	std::indirect_equivalence_relation<std::projected<Iter, Proj>> Comp = std::ranges::equal_to>
+    constexpr auto unique(Iter left, Sent right, Comp f = {}, Proj p = {}) -> std::ranges::subrange<Iter>
+    {
+	left = adjacent_find(left, right, f, p);
+	if(left == right)
+	    return {left, left};
+
+	auto i{left++};
+	while(++left != right)
+	    if(!std::invoke(f, std::invoke(p, *i), std::invoke(p, *left)))
+		*++i = std::ranges::iter_move(left);
+
+	return {++i, left};
+    }
+
+    template<std::ranges::forward_range Range,
+	typename Proj = std::identity,
+	std::indirect_equivalence_relation<
+	    std::projected<std::ranges::iterator_t<Range>, Proj>
+	    > Comp = std::ranges::equal_to>
+    constexpr auto unique(Range&& range, Comp f = {}, Proj p = {}) -> std::ranges::borrowed_subrange_t<Range>
+    {
+	return ::alg::unique(std::begin(range), std::end(range), std::move(f), std::move(p));
+    }
+
+
+    //********************** unique_copy ***************************
+
+    template<std::input_iterator Iter, std::sentinel_for<Iter> Sent,
+	std::weakly_incrementable Out, typename Proj = std::identity,
+	std::indirect_equivalence_relation<std::projected<Iter, Proj>> Comp = std::ranges::equal_to>
+    requires std::indirectly_copyable<Iter, Out> && (std::forward_iterator<Iter> ||
+	    (std::input_iterator<Out> && std::same_as<std::iter_value_t<Iter>, std::iter_value_t<Out>>) ||
+	    std::indirectly_copyable_storable<Iter, Out>)
+    constexpr auto unique_copy(Iter left, Sent right, Out out, Comp f = {}, Proj p = {}) -> std::ranges::in_out_result<Iter, Out>
+    {
+	if(left != right) {
+	    auto val = *left;
+	    *out++ = val;
+
+	    while(++left != right) {
+		auto&& next_val = *left;
+		if(!std::invoke(f, std::invoke(p, next_val), std::invoke(p, val))) {
+		    val = std::forward<decltype(next_val)>(next_val);
+		    *out++ = val;
+		}
+	    }
+	}
+	return {std::move(left), std::move(out)};
+    }
+
+    template<std::ranges::input_range Range,
+	std::weakly_incrementable Out, typename Proj = std::identity,
+	std::indirect_equivalence_relation<
+	    std::projected<std::ranges::iterator_t<Range>, Proj>
+	    > Comp = std::ranges::equal_to>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out> && 
+	    (std::forward_iterator<std::ranges::iterator_t<Range>> ||
+	    (std::input_iterator<Out> && std::same_as<std::iter_value_t<std::ranges::iterator_t<Range>>, std::iter_value_t<Out>>) ||
+	    std::indirectly_copyable_storable<std::ranges::iterator_t<Range>, Out>)
+    constexpr auto unique_copy(Range&& range, Out out, Comp f = {}, Proj p = {}) 
+	-> std::ranges::in_out_result<std::ranges::borrowed_iterator_t<Range>, Out>
+    {
+	return ::alg::unique_copy(std::begin(range), std::end(range), std::move(out), std::move(f), std::move(p));
+    }
+
+
+    //************************ rotate ******************************
+
+    template<std::permutable Iter, std::sentinel_for<Iter> Sent>
+    constexpr auto rotate(Iter left, Iter middle, Sent right) -> std::ranges::subrange<Iter>
+    {
+	if(left == middle) {
+	    auto last{std::ranges::next(left, right)};
+	    return {last, last};
+	}
+
+	if(middle == right)
+	    return {std::move(left), std::move(middle)};
+
+	if constexpr(std::bidirectional_iterator<Iter>) {
+	    ::alg::reverse(left, middle);
+	    auto last{std::ranges::next(left, right)};
+	    ::alg::reverse(middle, last);
+
+	    if constexpr(std::random_access_iterator<Iter>) {
+		::alg::reverse(left, last);
+		return {left + (last - middle), std::move(last)};
+	    } else { // !random_access_iterator<Iter>
+		auto mid_last{last};
+		do {
+		    ::alg::iter_swap(left, --mid_last);
+		    ++left;
+		} while(left != middle && mid_last != middle);
+		::alg::reverse(left, mid_last);
+
+		if(left == middle)
+		    return {std::move(mid_last), std::move(last)};
+		else
+		    return {std::move(left), std::move(last)};
+	    }
+	} else { // forward_iterator<Iter>
+	    auto next{middle};
+	    do {
+		::alg::iter_swap(left, next);
+		++left, ++next;
+		if(left == middle)
+		    middle = next;
+	    } while(next != right);
+
+	    auto new_left{left};
+	    while(middle != right) {
+		next = middle;
+		do {
+		    ::alg::iter_swap(left, next);
+		    ++left, ++next;
+		    if(left == middle)
+			middle = next;
+		} while(next != right);
+	    }
+	    return {std::move(new_left), std::move(middle)};
+	}
+    }
+
+    template<std::ranges::forward_range Range>
+    requires std::permutable<std::ranges::iterator_t<Range>>
+    constexpr auto rotate(Range&& range, std::ranges::iterator_t<Range> middle) -> std::ranges::borrowed_subrange_t<Range>
+    {
+	return ::alg::rotate(std::begin(range), std::move(middle), std::end(range));
+    }
+
+
+    //********************** rotate_copy ***************************
+
+    template<std::forward_iterator Iter, std::sentinel_for<Iter> Sent,
+	std::weakly_incrementable Out>
+    requires std::indirectly_copyable<Iter, Out>
+    constexpr auto rotate_copy(Iter left, Iter middle, Sent right, Out out) -> std::ranges::in_out_result<Iter, Out>
+    {
+	auto copy1{::alg::copy(middle, std::move(right), std::move(out))};
+	auto copy2{::alg::copy(std::move(left), std::move(middle), std::move(copy1.out))};
+	return {std::move(copy1.in), std::move(copy2.out)};
+    }
+
+    template<std::ranges::forward_range Range, std::weakly_incrementable Out>
+    requires std::indirectly_copyable<std::ranges::iterator_t<Range>, Out>
+    constexpr auto rotate_copy(Range&& range, std::ranges::iterator_t<Range> middle, Out out)
+	-> std::ranges::in_out_result<std::ranges::iterator_t<Range>, Out>
+    {
+	return ::alg::rotate_copy(std::begin(range), std::move(middle), std::end(range), std::move(out));
+    }
+
+
+    //********************** shift_left ***************************
+
+    template<std::permutable Iter, std::sentinel_for<Iter> Sent>
+    constexpr auto shift_left(Iter left, Sent right, std::iter_difference_t<Iter> n)
+	-> std::ranges::subrange<Iter> 
+    {
+	if(n >= std::distance(left, right) || !n)
+	    return {left, left};
+
+	auto beginning{std::ranges::next(left, n)};
+
+	auto ret = ::alg::move(beginning, std::move(right), left);
+
+	return {std::move(left), std::move(ret.out)};
+    }
+
+    template<std::ranges::forward_range Range>
+    requires std::permutable<std::ranges::iterator_t<Range>>
+    constexpr auto shift_left(Range&& range, std::ranges::range_difference_t<Range> n)
+	-> std::ranges::borrowed_subrange_t<Range>
+    {
+	return ::alg::shift_left(std::begin(range), std::end(range), std::move(n));
+    }
+
+
+    //********************** shift_right ***************************
+
+    template<std::forward_iterator Iter, std::sentinel_for<Iter> Sent>
+    requires std::permutable<Iter>
+    constexpr auto shift_right(Iter left, Sent right, std::iter_difference_t<Iter> n)
+	-> std::ranges::subrange<Iter>
+    {
+	if(!n)
+	    return {left, right};
+
+	if constexpr(std::bidirectional_iterator<Iter>) {
+	    auto len{std::distance(left, right)};
+
+	    if(n >= len)
+	        return {right, right};
+
+	    auto ending{std::ranges::next(left, len - n)};
+	    auto beginning = std::ranges::next(left, right);
+	    auto ret = ::alg::move_backwards(std::move(left), std::move(ending), beginning);
+	    return {std::move(ret.out), std::move(right)};
+	} else { // forward_iterator<Iter>
+	    Iter middle{left};
+	    for(std::iter_difference_t<Iter> i{}; i != n && middle != right; ++i, ++middle);
+
+	    if(middle == right || ++middle == right)
+		return {std::move(left), std::move(middle)};
+
+	    return ::alg::rotate(std::move(left), std::move(middle), std::move(right)); 
+	}
+    }
+
+    template<std::ranges::forward_range Range>
+    requires std::permutable<std::ranges::iterator_t<Range>>
+    constexpr auto shift_right(Range&& range, std::ranges::range_difference_t<Range> n)
+	-> std::ranges::borrowed_subrange_t<Range>
+    {
+	return ::alg::shift_right(std::begin(range), std::end(range), std::move(n));
     }
 
 
