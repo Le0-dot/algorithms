@@ -44,7 +44,7 @@ TEST_F(sample_test, RangeTest)
 {
     auto res = alg::sample(v1, std::begin(v2), 3, gen);
 
-    EXPECT_EQ(v1, (std::vector{1, 4, 5}));
+    EXPECT_EQ(v2, (std::vector{1, 4, 5}));
     EXPECT_EQ(res, std::end(v2));
 }
 
